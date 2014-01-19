@@ -308,10 +308,14 @@ module Html2haml
             end
             return lines.map {|s| output + s + "\n"}.join
           when "haml_silent"
-            return CGI.unescapeHTML(inner_text).split("\n").map do |line|
-              next "" if line.strip.empty?
-              "#{output}- #{line.strip}\n"
-            end.join
+            lines = CGI.unescapeHTML(inner_text).strip.split("\n").reject(&:empty?)
+            if lines.count == 1
+              return "#{output}- #{lines[0]}\n"
+            else
+              return "#{output}:ruby\n" + lines.map do |line|
+                "#{tabulate(tabs + 1)}#{line}\n"
+              end.join
+            end
           when "haml_block"
             return render_children("", tabs, options)
           end
