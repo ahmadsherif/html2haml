@@ -309,10 +309,11 @@ module Html2haml
             return lines.map {|s| output + s + "\n"}.join
           when "haml_silent"
             lines = CGI.unescapeHTML(inner_text).strip.split("\n").reject(&:empty?)
-            if lines.count == 1
-              return "#{output}- #{lines[0]}\n"
+            return case lines.count
+            when 0 then ""
+            when 1 then "#{output}- #{lines[0]}\n"
             else
-              return "#{output}:ruby\n" + lines.map do |line|
+              "#{output}:ruby\n" + lines.map do |line|
                 "#{tabulate(tabs + 1)}#{line}\n"
               end.join
             end
